@@ -1,0 +1,22 @@
+// Place all the styles related to the pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+#container {
+  width:800px;
+  margin:auto;
+}
+
+#query_form {
+ width:500px; 
+ margin:50px auto;
+}
+
+#query_form input[type="text"] {
+  width:300px;
+}
+
+#query_form label {
+  float:right;
+}

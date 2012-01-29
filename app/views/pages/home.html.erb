@@ -1,0 +1,109 @@
+<script type="text/javascript" charset="utf-8">
+  
+  var globalStrProsperURL = "https://services.prosper.com/ProsperAPI.asmx";
+
+  function Query()
+  {
+      ShowCursorWait('btnQuery');
+      var parameterList = new SOAPClientParameters();
+      parameterList.add("authenticationToken", document.getElementById("txtQueryAuthToken").value);
+      parameterList.add("objectType", document.getElementById("txtQueryObjectType").value);
+      parameterList.add("fields", document.getElementById("txtQueryFields").value);
+      parameterList.add("conditionExpression", document.getElementById("txtQueryConditionExpression").value);
+      SOAPClient.invoke(globalStrProsperURL, "Query", parameterList, true, Query_Callback);
+  } 
+
+  // Handles the results from the SOAP call
+  function Query_Callback(prosperObjectResult)
+  {
+      ShowCursorDefault('btnQuery');
+      if (prosperObjectResult == null) 
+      {
+          document.getElementById("divQueryResults").innerHTML = "<font color=\"#CC0000\">Error: null results</font>";
+          return;
+      }
+      if (prosperObjectResult.Success != true)
+      {
+          document.getElementById("divQueryResults").innerHTML = "<font color=\"#CC0000\">Error: " + prosperObjectResult.Message + "</font>";
+          return;
+      }
+      // set it up
+   	var strFields = document.getElementById("txtQueryFields").value;
+     	var arrField = strFields.split(",");
+      var strContent = "<table width=\"100%\" border=\"1\">";
+      strContent += ResultsToTableRows(arrField, prosperObjectResult.ProsperObjects);
+      strContent += "</table>";
+      document.getElementById("results").innerHTML = strContent;
+  }
+      
+      function ResultsToTableRows(arrField, prosperObject) 
+      {
+          var strContent = "<tr>";
+          for (var nColumn = 0; nColumn < arrField.length; ++nColumn)
+          {
+              strContent += "<th>" + Trim(arrField[nColumn]) + "</th>";
+          }
+          strContent += "</tr>";
+          for (var nRow = 0; nRow < prosperObject.length; ++nRow)
+          {
+              var rowItem = prosperObject[nRow];
+              strContent += "<tr>";
+              for (var nColumn = 0; nColumn < arrField.length; ++nColumn)
+              {
+                  strContent += "<td>" + rowItem[Trim(arrField[nColumn])] + "</td>";
+              }
+              strContent += "</tr>";
+          }
+          return strContent;
+      }
+      
+      function Trim(value)
+      {
+      	var re = /\s*((\S+\s*)*)/;
+      	value = value.replace(re, "$1");
+      	re = /((\s*\S+)*)\s*/;
+      	return value.replace(re, "$1");
+      }
+      
+      function ShowCursorWait(strButtonName)
+      {
+          document.body.style.cursor = 'wait';
+          document.getElementById(strButtonName).disabled = true;
+      }
+
+      function ShowCursorDefault(strButtonName)
+      {
+          document.body.style.cursor = 'default';
+          document.getElementById(strButtonName).disabled = false;
+      }
+      
+</script>
+<div id="query_form">
+  <table>
+    <tr>
+      <td><label for="txtQueryAuthToken">Authentication Token</label></td>
+      <td><input type="text" name="txtQueryAuthToken" id="txtQueryAuthToken"></td>
+    </tr>
+    <tr>
+      <td><label for="txtQueryObjectType">Object Type</label></td>
+      <td><input type="text" name="txtQueryObjectType" id="txtQueryObjectType"></td>
+    </tr>
+    <tr>
+      <td><label for="txtQueryFields">Fields</label></td>
+      <td><input type="text" name="txtQueryFields" id="txtQueryFields"></td>
+    </tr>
+    <tr>
+      <td><label for="txtQueryConditionExpression">Conditional Expression</label></td>
+      <td><input type="text" name="txtQueryConditionExpression" id="txtQueryConditionExpression"></td>
+    </tr>
+    <tr>
+      <td></td><td><input type="button" name="btnQuery" value="Query" id="btnQuery" onclick="Query(); return false;"></td>
+    </tr>
+  </table>
+</div>
+<div id="results">
+</div>
+
+
+
+
